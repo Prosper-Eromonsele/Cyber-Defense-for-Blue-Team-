@@ -1,1 +1,16 @@
 
+# =====================================================
+# CUSTOM DETECTION RULES - Cyber Defense Mastery Lab
+# =====================================================
+
+# Rule 1: Detect scripted HTTP access (curl, wget, scripts)
+# Real-world: Attackers use automated tools, not browsers
+alert http any any -> $HOME_NET any (msg:"SUSPICIOUS - Non-Browser HTTP Client Detected"; flow:established,to_server; content:"curl"; http_user_agent; nocase; classtype:bad-unknown; sid:1000001; rev:1;)
+
+# Rule 2: Detect lateral movement (internal host scanning internal host)
+# Real-world: Ransomware spreads by scanning internal network
+alert tcp $HOME_NET any -> $HOME_NET any (msg:"LATERAL MOVEMENT - Internal Host Scanning"; flags:S; detection_filter:track by_src, count 50, seconds 30; classtype:attempted-recon; sid:1000002; rev:2;)
+
+# Rule 3: Detect SMB port access (WannaCry/NotPetya pattern)
+# Real-world: Ransomware targets port 445 for propagation
+alert tcp any any -> $HOME_NET 445 (msg:"CRITICAL - SMB Port Access Detected"; flow:to_server; flags:S; classtype:attempted-recon; sid:1000003; rev:2;)
